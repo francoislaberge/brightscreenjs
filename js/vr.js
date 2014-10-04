@@ -306,15 +306,16 @@ vr.loop = function(options) {
   // TODO: Verify that using requestAnimationFrame leads to smoother visuals,
   // using setTimeout to a low delay seems to create a higher framerate, but is it wasted
   // on screens that can't render quickly enough
-  setTimeout(function(){
-    vr.loop(options);
-  },1);
-  
-  /*
-  requestAnimationFrame(function(){
+  if(useRequestAnimationFrame) {
+    requestAnimationFrame(function(){
     vr.loop(options);
   });
-  */
+  }
+  else {
+    setTimeout(function(){
+    vr.loop(options);
+  },1);
+  }
 
   // 
   if( typeof options.update==='function' ) {

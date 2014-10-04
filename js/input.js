@@ -8,6 +8,9 @@ in3dMode = true;
 // Should we render the movie layout down or situp mode (Global)
 layDownMode = false;
 
+// Should we use requestAnimationFrame or a setInterval style update/render loop (Global)
+useRequestAnimationFrame = true;
+
 // Should we render the movie in 3D mode (Global)
 fakeFullscreen = false;
 
@@ -29,6 +32,13 @@ window.addEventListener("keydown", function(ev) {
   if (ev.keyCode == "D".charCodeAt(0))  {
     fakeFullscreen = !fakeFullscreen;
   }
+
+  // Toggle requestAnimationFrame usage
+  if (ev.keyCode == "A".charCodeAt(0))  {
+    useRequestAnimationFrame = !useRequestAnimationFrame;
+  }
+
+  
 
 
   // Toggle flag that allows you to fake going fullscreen in VR. Makes it easier to debug

@@ -5,8 +5,10 @@ videoScene = {};
 var renderer = vr.renderer,
     scene = vr.scene;
 
-var videoWidth = 1920,   // 480
-    videoHeight = 1080;  // 204
+var videoWidth = 960,   // 480
+    videoHeight = 540;  // 204
+
+// 960 x 1080 (2x vertical)
 
 var video, image, imageContext,
     imageReflection, imageReflectionContext, imageReflectionGradient,
