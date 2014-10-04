@@ -46,17 +46,17 @@ vr.loop({
 
   },
 
-  // Called just before the left is going to render (if we're in vr mode, so beforeMono() for when we're not)
+  // Called just before the left eye is going to render (if we're in vr mode, so beforeMono() for when we're not)
   beforeLeftRender: function() {
 
   },
 
-  // Called just before the left is going to render (if we're in vr mode, so beforeMono() for when we're not)
+  // Called just before the right eye is going to render (if we're in vr mode, so beforeMono() for when we're not)
   beforeRightRender: function() {
 
   },
 
-  beforeMono: function() {
+  beforeMonoRender: function() {
 
   }
 });

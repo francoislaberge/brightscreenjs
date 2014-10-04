@@ -32,7 +32,7 @@ vr.loop({
       //consol.log('Using camera orientation');
     }
 
-    videoScene.update();
+    
   },
 
   // Called before any rendering logic
@@ -40,18 +40,22 @@ vr.loop({
 
   },
 
-  // Called just before the left is going to render (if we're in vr mode, so beforeMono() for when we're not)
+  // Called just before the left eye is going to render (if we're in vr mode, so beforeMono() for when we're not)
   beforeLeftRender: function() {
-
+    
+    videoScene.beforeLeftRender();
+    console.log('beforeLeftRender');
   },
 
-  // Called just before the left is going to render (if we're in vr mode, so beforeMono() for when we're not)
+  // Called just before the right eye is going to render (if we're in vr mode, so beforeMono() for when we're not)
   beforeRightRender: function() {
-
+    
+    videoScene.beforeRightRender();
+    console.log('beforeRightRender');
   },
 
-  beforeMono: function() {
-
+  beforeMonoRender: function() {
+    videoScene.beforeMonoRender();
   }
 });
 
