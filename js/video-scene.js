@@ -5,8 +5,8 @@ videoScene = {};
 var renderer = vr.renderer,
     scene = vr.scene;
 
-var videoWidth = 960,   // 480
-    videoHeight = 400;  // 204
+var videoWidth =  480
+    videoHeight =  204
 
 var video, image, imageContext,
     imageReflection, imageReflectionContext, imageReflectionGradient,
@@ -18,7 +18,7 @@ videoScene.init = function() {
   init();
 }
 
-videoScene.update = function() {
+videoScene.beforeMonoRender = function() {
   if ( video.readyState === video.HAVE_ENOUGH_DATA ) {
     imageContext.drawImage( video, 0, 0 );
 
@@ -26,9 +26,46 @@ videoScene.update = function() {
     if ( textureReflection ) textureReflection.needsUpdate = true;
   }
 
-  imageReflectionContext.drawImage( image, 0, 0 );
-  imageReflectionContext.fillStyle = imageReflectionGradient;
-  imageReflectionContext.fillRect( 0, 0, 480, 204 );
+  //imageReflectionContext.drawImage( image, 0, 0 );
+  //imageReflectionContext.fillStyle = imageReflectionGradient;
+  //imageReflectionContext.fillRect( 0, 0, 480, 204 );
+}
+
+videoScene.beforeLeftRender = function() {
+  if ( video.readyState === video.HAVE_ENOUGH_DATA ) {
+    imageContext.drawImage( video, 0, 0 );
+
+    if ( texture ) texture.needsUpdate = true;
+    //if ( textureReflection ) textureReflection.needsUpdate = true;
+  }
+
+  //imageReflectionContext.drawImage( image, 0, 0 );
+  //imageReflectionContext.fillStyle = imageReflectionGradient;
+  //imageReflectionContext.fillRect( 0, 0, 480, 204 );
+}
+
+videoScene.beforeRightRender = function() {
+  // Skip copying the right frame over the left frame if 3d mode is disabled
+  if( in3dMode===false ){
+    return;
+  }
+
+  if ( video.readyState === video.HAVE_ENOUGH_DATA ) {
+    imageContext.drawImage( 
+      video, 
+      // Source
+      0, videoHeight, videoWidth, videoHeight,
+      // Destination
+      0, 0, videoWidth, videoHeight
+       );
+
+    if ( texture ) texture.needsUpdate = true;
+    //if ( textureReflection ) textureReflection.needsUpdate = true;
+  }
+
+  //imageReflectionContext.drawImage( image, 0, 0 );
+  //imageReflectionContext.fillStyle = imageReflectionGradient;
+  //imageReflectionContext.fillRect( 0, 0, 480, 204 );
 }
 
 function init() {
@@ -43,14 +80,14 @@ function init() {
 
   imageContext = image.getContext( '2d' );
   imageContext.fillStyle = '#000000';
-  imageContext.fillRect( 0, 0, 480, 204 );
+  imageContext.fillRect( 0, 0, videoWidth, videoHeight );
 
   texture = new THREE.Texture( image );
   texture.minFilter = THREE.LinearFilter;
   texture.magFilter = THREE.LinearFilter;
 
   var material = new THREE.MeshBasicMaterial( { map: texture, overdraw: 0.5 } );
-
+/*
   imageReflection = document.createElement( 'canvas' );
   imageReflection.width = videoWidth;
   imageReflection.height = videoHeight;
@@ -70,7 +107,7 @@ function init() {
   textureReflection.magFilter = THREE.LinearFilter;
 
   var materialReflection = new THREE.MeshBasicMaterial( { map: textureReflection, side: THREE.BackSide, overdraw: 0.5 } );
-
+*/
   //
 
   var screenSize = 1.5;
