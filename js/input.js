@@ -2,7 +2,10 @@
 
 window.addEventListener("keydown", function(ev) {
   if (ev.keyCode == "R".charCodeAt(0))  {
-    vr.reset();
+    //vr.reset();
+  }
+  if (ev.keyCode == "F".charCodeAt(0))  {
+    vr.fullscreen();
   }
   if (ev.keyCode == 187 || ev.keyCode == 61)  { // "+" key
     vr.resizeFOV(0.1);

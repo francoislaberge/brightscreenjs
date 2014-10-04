@@ -3,6 +3,10 @@
 var renderer = vr.renderer,
     scene = vr.scene;
 
+vr.camera.position.z = 12;
+vr.cameraLeft.position.z = 12;
+vr.cameraRight.position.z = 12;
+
 renderer.setClearColor(0x202020, 1.0);
 
 hmdScene.init();
