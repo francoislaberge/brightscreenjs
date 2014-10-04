@@ -50,6 +50,8 @@ vr.reset = function(){
 
 vr.getState = function(){
   
+  //console.log('hmdDevice' + hmdDevice);
+  //console.log('sensorDevice' + sensorDevice);
   if (hmdDevice && sensorDevice) {
     return sensorDevice.getState();
   }
@@ -91,12 +93,17 @@ function PerspectiveMatrixFromVRFieldOfView(fov, zNear, zFar) {
   return outMat;
 }
 
-var cameraLeft = new THREE.PerspectiveCamera( 75, 4/3, 0.1, 1000 );
-var cameraRight = new THREE.PerspectiveCamera( 75, 4/3, 0.1, 1000 );
+var cameraLeft = new THREE.PerspectiveCamera( 75, 4/3, 0.1, 100000 );
+var cameraRight = new THREE.PerspectiveCamera( 75, 4/3, 0.1, 100000 );
+
+// Make these two camera available to other modules
+vr.cameraLeft = cameraLeft;
+vr.cameraRight = cameraRight;
+
 
 var fovScale = 1.0;
 
-vr.resizeFOV = function (amount) {
+vr.resizeFOV = function resizeFOV(amount) {
   var fovLeft, fovRight;
 
   if (!hmdDevice) { return; }
@@ -162,7 +169,7 @@ function EnumerateVRDevices(devices) {
       cameraRight.position.add(eyeOffsetRight);
       cameraRight.position.z = 1000;
 
-      resizeFOV(0.0);
+      vr.resizeFOV(0.0);
     }
   }
 
@@ -190,8 +197,7 @@ if (navigator.getVRDevices) {
 /*
  * Create the camera that will be used for rendering
  */
-var camera = new THREE.PerspectiveCamera( 75, window.innerWidth / window.innerHeight, 0.1, 1000 );
-camera.position.z = 12;
+var camera = new THREE.PerspectiveCamera( 75, window.innerWidth / window.innerHeight, 0.1, 100000 );
 
 // Make this camera available to other modules
 vr.camera = camera;
@@ -254,10 +260,14 @@ vr.loop = function(options) {
   // TODO: Verify that using requestAnimationFrame leads to smoother visuals,
   // using setTimeout to a low delay seems to create a higher framerate, but is it wasted
   // on screens that can't render quickly enough
+  /*
   setTimeout(function(){
     vr.loop(options);
   },1);
-  //requestAnimationFrame(render);
+  */
+  requestAnimationFrame(function(){
+    vr.loop(options);
+  });
 
   // 
   if( typeof options.update==='function' ) {

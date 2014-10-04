@@ -2,16 +2,17 @@
 
 videoScene = {};  
 
-  var AMOUNT = 100;
+var renderer = vr.renderer,
+    scene = vr.scene;
 
-  var renderer = vr.renderer,
-      scene = vr.scene;
+var videoWidth = 960,   // 480
+    videoHeight = 400;  // 204
 
-  var video, image, imageContext,
-      imageReflection, imageReflectionContext, imageReflectionGradient,
-      texture, textureReflection;
+var video, image, imageContext,
+    imageReflection, imageReflectionContext, imageReflectionGradient,
+    texture, textureReflection;
 
-  var mesh;
+var mesh;
 
 videoScene.init = function() {
   init();
@@ -37,8 +38,8 @@ function init() {
   //
 
   image = document.createElement( 'canvas' );
-  image.width = 480;
-  image.height = 204;
+  image.width = videoWidth;
+  image.height = videoHeight;
 
   imageContext = image.getContext( '2d' );
   imageContext.fillStyle = '#000000';
@@ -51,12 +52,12 @@ function init() {
   var material = new THREE.MeshBasicMaterial( { map: texture, overdraw: 0.5 } );
 
   imageReflection = document.createElement( 'canvas' );
-  imageReflection.width = 480;
-  imageReflection.height = 204;
+  imageReflection.width = videoWidth;
+  imageReflection.height = videoHeight;
 
   imageReflectionContext = imageReflection.getContext( '2d' );
   imageReflectionContext.fillStyle = '#000000';
-  imageReflectionContext.fillRect( 0, 0, 480, 204 );
+  imageReflectionContext.fillRect( 0, 0, videoWidth, videoHeight );
 
   imageReflectionGradient = imageReflectionContext.createLinearGradient( 0, 0, 0, 204 );
   imageReflectionGradient.addColorStop( 0, 'rgba(0, 0, 0, 1)' );
@@ -74,17 +75,21 @@ function init() {
 
   var screenSize = 1.5;
   var plane = new THREE.PlaneGeometry( 480*screenSize, 204*screenSize, 4, 4 );
+  vr.plane = plane;
 
   mesh = new THREE.Mesh( plane, material );
   mesh.scale.x = mesh.scale.y = mesh.scale.z = 1.5;
   scene.add(mesh);
 
+  vr.mesh = mesh;
+  vr.mesh.translateY(160);
+/*
   mesh = new THREE.Mesh( plane, materialReflection );
   mesh.position.y = -306*screenSize;
   mesh.rotation.x = - Math.PI;
   mesh.scale.x = mesh.scale.y = mesh.scale.z = 1.5;
   scene.add( mesh );
-  
+  */
 
   //
 
