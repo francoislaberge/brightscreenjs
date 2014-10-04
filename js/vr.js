@@ -3,6 +3,14 @@
 // Create global namespace to attach our API functions to
 vr = {};
 
+// Create a virtual position for the user. The translation and the orientation
+// of the VR Headset will add/rotate off of this frame of reference
+vr.position = {
+  x: 0,
+  y: 0,
+  z: 0
+}
+
 var VR_POSITION_SCALE = 25;
 
 function printVector(values) {
@@ -37,6 +45,9 @@ var vrMode = false;
 var stats = document.getElementById("stats");
 var renderTargetWidth = 1920;
 var renderTargetHeight = 1080;
+var nearPlane = 0.1;
+var farPlane = 100000;
+
 
 vr.inVRMode = function(){
   return vrMode;
@@ -93,8 +104,8 @@ function PerspectiveMatrixFromVRFieldOfView(fov, zNear, zFar) {
   return outMat;
 }
 
-var cameraLeft = new THREE.PerspectiveCamera( 75, 4/3, 0.1, 100000 );
-var cameraRight = new THREE.PerspectiveCamera( 75, 4/3, 0.1, 100000 );
+var cameraLeft = new THREE.PerspectiveCamera( 75, 4/3, nearPlane, farPlane );
+var cameraRight = new THREE.PerspectiveCamera( 75, 4/3, nearPlane, farPlane );
 
 // Make these two camera available to other modules
 vr.cameraLeft = cameraLeft;
@@ -146,8 +157,8 @@ vr.resizeFOV = function resizeFOV(amount) {
     fovRight = hmdDevice.getRecommendedEyeFieldOfView("right");
   }
 
-  cameraLeft.projectionMatrix = PerspectiveMatrixFromVRFieldOfView(fovLeft, 0.1, 1000);
-  cameraRight.projectionMatrix = PerspectiveMatrixFromVRFieldOfView(fovRight, 0.1, 1000);
+  cameraLeft.projectionMatrix = PerspectiveMatrixFromVRFieldOfView(fovLeft, nearPlane, farPlane);
+  cameraRight.projectionMatrix = PerspectiveMatrixFromVRFieldOfView(fovRight, nearPlane, farPlane);
 }
 
 function EnumerateVRDevices(devices) {
@@ -197,7 +208,7 @@ if (navigator.getVRDevices) {
 /*
  * Create the camera that will be used for rendering
  */
-var camera = new THREE.PerspectiveCamera( 75, window.innerWidth / window.innerHeight, 0.1, 100000 );
+var camera = new THREE.PerspectiveCamera( 75, window.innerWidth / window.innerHeight, nearPlane, farPlane );
 
 // Make this camera available to other modules
 vr.camera = camera;
@@ -245,12 +256,47 @@ vr.fullscreen = function(){
   vrMode = true;
   console.log('vr.fullscreen, vrMode = true');
   resize();
-  if (renderer.domElement.webkitRequestFullscreen) {
+  if ( renderer.domElement.webkitRequestFullscreen && fakeFullscreen===false ) {
     renderer.domElement.webkitRequestFullscreen({ vrDisplay: hmdDevice });
-  } else if (renderer.domElement.mozRequestFullScreen) {
+  } 
+  else if ( renderer.domElement.mozRequestFullScreen && fakeFullscreen===false ) {
     renderer.domElement.mozRequestFullScreen({ vrDisplay: hmdDevice });
   }
 };
+
+
+translatedScale = 1000;
+function updateCamera(camera){
+
+  // Set the position of the camera based on the virtual player position
+  camera.position.x = vr.position.x;
+  camera.position.y = vr.position.y;
+  camera.position.z = vr.position.z;
+
+  // read the orientation from the HMD, and set the rotation on both cameras
+  var state = vr.getState();
+  if(state) {
+
+    // Don't update the orientation when not in vrMode, even if a device has connected
+    if (state.orientation && vrMode) {
+      //console.log('starting camera orientation');
+      var qrot = new THREE.Quaternion();
+      qrot.set(state.orientation.x, state.orientation.y, state.orientation.z, state.orientation.w);
+      camera.setRotationFromQuaternion(qrot);
+    }
+
+
+    if (state.position) {
+      //console.log(state.position);
+
+      // Multiply by translate scale as the position changes seem to be small
+      camera.position.x = vr.position.x+state.position.x*translatedScale;
+      camera.position.y = vr.position.y+state.position.y*translatedScale;
+      camera.position.z = vr.position.z+state.position.z*translatedScale;
+      
+    }
+  }
+}
 
 vr.loop = function(options) {
   options = options || {};
@@ -260,22 +306,26 @@ vr.loop = function(options) {
   // TODO: Verify that using requestAnimationFrame leads to smoother visuals,
   // using setTimeout to a low delay seems to create a higher framerate, but is it wasted
   // on screens that can't render quickly enough
-  /*
   setTimeout(function(){
     vr.loop(options);
   },1);
-  */
+  
+  /*
   requestAnimationFrame(function(){
     vr.loop(options);
   });
+  */
 
   // 
   if( typeof options.update==='function' ) {
     options.update();
   }
 
+  // Update the camera position based
+
   if (vrMode) {
     // Render left eye
+    updateCamera(cameraLeft);
     if( typeof options.beforeLeftRender==='function' ) {
       options.beforeLeftRender();
     };
@@ -285,6 +335,7 @@ vr.loop = function(options) {
     renderer.render(scene, cameraLeft);
 
     // Render right eye
+    updateCamera(cameraRight);
     if( typeof options.beforeRightRender==='function' ) {
       options.beforeRightRender();
     }
@@ -292,6 +343,8 @@ vr.loop = function(options) {
     renderer.setViewport( renderTargetWidth / 2, 0, renderTargetWidth / 2, renderTargetHeight );
     renderer.render(scene, cameraRight);
   } else {
+    updateCamera(camera);
+
     // Render mono view
     if( typeof options.beforeMonoRender==='function' ) {
       options.beforeMonoRender();

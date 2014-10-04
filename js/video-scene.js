@@ -5,8 +5,8 @@ videoScene = {};
 var renderer = vr.renderer,
     scene = vr.scene;
 
-var videoWidth =  480
-    videoHeight =  204
+var videoWidth = 1920,   // 480
+    videoHeight = 1080;  // 204
 
 var video, image, imageContext,
     imageReflection, imageReflectionContext, imageReflectionGradient,
@@ -16,6 +16,40 @@ var mesh;
 
 videoScene.init = function() {
   init();
+}
+
+videoScene.update = function() {
+
+  if(layDownMode===false) {
+    vr.position.x = 0;
+    vr.position.y = 0;
+    vr.position.z = 620;
+
+    vr.mesh.position.x = 0;
+    vr.mesh.position.y = 40;
+    vr.mesh.position.z = 0;
+
+    vr.mesh.lookAt(vr.position);
+  } else {
+    vr.position.x = 0;
+    vr.position.y = -620;
+    vr.position.z = 10;
+
+    vr.mesh.position.x = 0;
+    vr.mesh.position.y = -300;
+    vr.mesh.position.z = 0;
+
+    //vr.mesh.up.z=1;
+    //vr.mesh.up.y=0;
+    
+    //vr.mesh.up.z=1;vr.mesh.up.y=0
+    vr.mesh.lookAt({
+      x: vr.position.x,
+      y: vr.position.y,
+      z: vr.position.z
+    });
+  }
+
 }
 
 videoScene.beforeMonoRender = function() {
@@ -119,7 +153,6 @@ function init() {
   scene.add(mesh);
 
   vr.mesh = mesh;
-  vr.mesh.translateY(160);
 /*
   mesh = new THREE.Mesh( plane, materialReflection );
   mesh.position.y = -306*screenSize;

@@ -2,8 +2,14 @@
 
 var paused = false;
 
-// Make this global
+// Should we render the movie in 3D mode (Global)
 in3dMode = true;
+
+// Should we render the movie layout down or situp mode (Global)
+layDownMode = false;
+
+// Should we render the movie in 3D mode (Global)
+fakeFullscreen = false;
 
 var bigMode = false;
 // Create a global variable for how far back big mode is so we can tune it via
@@ -17,6 +23,17 @@ window.addEventListener("keydown", function(ev) {
   // Reset the VR position (Currently not working)
   if (ev.keyCode == "R".charCodeAt(0))  {
     //vr.reset();
+  }
+
+  // Toggle flag that allows you to fake going fullscreen in VR. Makes it easier to debug
+  if (ev.keyCode == "D".charCodeAt(0))  {
+    fakeFullscreen = !fakeFullscreen;
+  }
+
+
+  // Toggle flag that allows you to fake going fullscreen in VR. Makes it easier to debug
+  if (ev.keyCode == "L".charCodeAt(0))  {
+    layDownMode = !layDownMode;
   }
 
   // Toggle Fullscreen/VR mode
