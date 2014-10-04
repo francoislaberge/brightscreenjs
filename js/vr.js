@@ -308,13 +308,13 @@ vr.loop = function(options) {
   // on screens that can't render quickly enough
   if(useRequestAnimationFrame) {
     requestAnimationFrame(function(){
-    vr.loop(options);
-  });
+      vr.loop(options);
+    });
   }
   else {
     setTimeout(function(){
-    vr.loop(options);
-  },1);
+      vr.loop(options);
+    },1);
   }
 
   // 

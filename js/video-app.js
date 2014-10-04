@@ -3,6 +3,7 @@
 var renderer = vr.renderer,
     scene = vr.scene;
 
+
 //vr.camera.farPlane = 10000;
 //vr.camera.updateProjectionMatrix();
 

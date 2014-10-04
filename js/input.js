@@ -38,9 +38,6 @@ window.addEventListener("keydown", function(ev) {
     useRequestAnimationFrame = !useRequestAnimationFrame;
   }
 
-  
-
-
   // Toggle flag that allows you to fake going fullscreen in VR. Makes it easier to debug
   if (ev.keyCode == "L".charCodeAt(0))  {
     layDownMode = !layDownMode;
