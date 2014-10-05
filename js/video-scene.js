@@ -28,6 +28,12 @@ videoScene.init = function() {
 videoScene.update = function() {
   var distance = bigMode ? screenDistance*0.75 : screenDistance;
 
+  var vrState = vr.getState();
+  if( vr.inVRMode() &&
+      vrState!==undefined && 
+      vrState.orientation) {
+    layDownMode = vrState.orientation.x>0.30 && vrState.orientation.z>0.0;
+  }
 
   if(layDownMode===false) {
     vr.position.x = 0;
@@ -78,7 +84,13 @@ videoScene.beforeMonoRender = function() {
 
 videoScene.beforeLeftRender = function() {
   if ( video.readyState === video.HAVE_ENOUGH_DATA ) {
-    imageContext.drawImage( video, 0, 0 );
+    imageContext.drawImage( 
+      video, 
+      // Source
+      0, 0, videoWidth, videoHeight,
+      // Destination
+      0, 0, videoWidth, videoHeight
+       );
 
     if ( texture ) texture.needsUpdate = true;
     //if ( textureReflection ) textureReflection.needsUpdate = true;

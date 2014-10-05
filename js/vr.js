@@ -239,6 +239,17 @@ resize();
   // Listen for resizes
 window.addEventListener("resize", resize, false);
 
+
+/*
+renderer.domElement.requestPointerLock = renderer.domElement.requestPointerLock ||
+                                         renderer.domElement.mozRequestPointerLock ||
+                                         renderer.domElement.webkitRequestPointerLock;
+
+document.exitPointerLock = document.exitPointerLock ||
+                          document.mozExitPointerLock ||
+                          document.webkitExitPointerLock;
+*/
+
 function onFullscreenChange() {
   if(!document.webkitFullscreenElement && !document.mozFullScreenElement) {
     console.log('onFullscreenChange, vrMode = false');
@@ -257,6 +268,11 @@ vr.fullscreen = function(){
 
   // Go fullscreen
   if ( vrMode === true ) {
+    /*
+    // Ask the browser to lock the pointer
+    renderer.domElement.requestPointerLock();
+    */
+
     if ( renderer.domElement.webkitRequestFullscreen && fakeFullscreen===false ) {
       renderer.domElement.webkitRequestFullscreen({ vrDisplay: hmdDevice });
     } 
@@ -272,6 +288,11 @@ vr.fullscreen = function(){
     else if ( document.mozCancelFullScreen ) {
       document.mozCancelFullScreen();
     }
+
+    /*
+    // Ask the browser to release the pointer
+    document.exitPointerLock();
+    */
   }
   
 };
