@@ -3,10 +3,15 @@
 videoScene = {};  
 
 var renderer = vr.renderer,
-    scene = vr.scene;
+    scene = vr.scene,
+    mesh;
 
-var videoWidth = 960,   // 480
-    videoHeight = 540;  // 204
+var videoWidth = 960,
+    videoHeight = 540,
+    videoAspectRatio = videoWidth/videoHeight,
+    screenDistance = 1.5,
+    screenWidth = 1.5,
+    screenHeight = screenWidth/videoAspectRatio;
 
 // 960 x 1080 (2x vertical)
 
@@ -21,36 +26,40 @@ videoScene.init = function() {
 }
 
 videoScene.update = function() {
+  var distance = bigMode ? screenDistance*0.75 : screenDistance;
+
 
   if(layDownMode===false) {
     vr.position.x = 0;
     vr.position.y = 0;
-    vr.position.z = 620;
+    vr.position.z = distance;
 
-    vr.mesh.position.x = 0;
-    vr.mesh.position.y = 40;
-    vr.mesh.position.z = 0;
+    mesh.position.x = 0;
+    mesh.position.y = 0;
+    mesh.position.z = 0;
 
-    vr.mesh.lookAt(vr.position);
+    mesh.lookAt(vr.position);
   } else {
     vr.position.x = 0;
-    vr.position.y = -620;
-    vr.position.z = 10;
+    vr.position.y = -distance;
+    vr.position.z = distance/600.0;
 
-    vr.mesh.position.x = 0;
-    vr.mesh.position.y = -300;
-    vr.mesh.position.z = 0;
+    mesh.position.x = 0;
+    mesh.position.y = 0;
+    mesh.position.z = 0;
 
     //vr.mesh.up.z=1;
     //vr.mesh.up.y=0;
     
     //vr.mesh.up.z=1;vr.mesh.up.y=0
-    vr.mesh.lookAt({
+    mesh.lookAt({
       x: vr.position.x,
       y: vr.position.y,
       z: vr.position.z
     });
   }
+
+  vrStats.vrState(vr.getState());
 
 }
 
@@ -106,55 +115,38 @@ videoScene.beforeRightRender = function() {
 
 function init() {
 
+  // Get a reference to the video element
   video = document.getElementById( 'video' );
 
-  //
-
+  // Create a canvas element that we will use to 
+  // copy video frames to and update the virtual tv screen's texture
   image = document.createElement( 'canvas' );
+    // Make it the same resolution as the video
   image.width = videoWidth;
   image.height = videoHeight;
-
   imageContext = image.getContext( '2d' );
-  imageContext.fillStyle = '#000000';
-  imageContext.fillRect( 0, 0, videoWidth, videoHeight );
 
+  // Create the texture that will be updated each frame with the most recent
+  // video frame
   texture = new THREE.Texture( image );
   texture.minFilter = THREE.LinearFilter;
   texture.magFilter = THREE.LinearFilter;
 
+  // Create a basic material and assign it this texture, this will be the material
+  // for the mesh that represents the movie screen
   var material = new THREE.MeshBasicMaterial( { map: texture, overdraw: 0.5 } );
-/*
-  imageReflection = document.createElement( 'canvas' );
-  imageReflection.width = videoWidth;
-  imageReflection.height = videoHeight;
 
-  imageReflectionContext = imageReflection.getContext( '2d' );
-  imageReflectionContext.fillStyle = '#000000';
-  imageReflectionContext.fillRect( 0, 0, videoWidth, videoHeight );
+  // Create a plane geometry, this is used to create meshes
+  var plane = new THREE.PlaneGeometry( screenWidth, screenHeight, 1, 1 );
 
-  imageReflectionGradient = imageReflectionContext.createLinearGradient( 0, 0, 0, 204 );
-  imageReflectionGradient.addColorStop( 0, 'rgba(0, 0, 0, 1)' );
-  imageReflectionGradient.addColorStop( 0.2, 'rgba(0, 0, 0, 1)' );
-  imageReflectionGradient.addColorStop( 1, 'rgba(0, 0, 0, 0.8)' );
-  
-
-  textureReflection = new THREE.Texture( imageReflection );
-  textureReflection.minFilter = THREE.LinearFilter;
-  textureReflection.magFilter = THREE.LinearFilter;
-
-  var materialReflection = new THREE.MeshBasicMaterial( { map: textureReflection, side: THREE.BackSide, overdraw: 0.5 } );
-*/
-  //
-
-  var screenSize = 1.5;
-  var plane = new THREE.PlaneGeometry( 480*screenSize, 204*screenSize, 4, 4 );
-  vr.plane = plane;
-
+  // Create a mesh from the plane geometry (The movie screen mesh)
   mesh = new THREE.Mesh( plane, material );
-  mesh.scale.x = mesh.scale.y = mesh.scale.z = 1.5;
+  mesh.scale.x = mesh.scale.y = mesh.scale.z = 1;
+    // Add the mesh to the screen
   scene.add(mesh);
 
-  vr.mesh = mesh;
+  // Assign 
+  //vr.mesh = mesh;
 /*
   mesh = new THREE.Mesh( plane, materialReflection );
   mesh.position.y = -306*screenSize;

@@ -14,18 +14,15 @@ useRequestAnimationFrame = true;
 // Should we render the movie in 3D mode (Global)
 fakeFullscreen = false;
 
-var bigMode = false;
-// Create a global variable for how far back big mode is so we can tune it via
-// the console without doing restarts
-bigModeDistance = 300;
+// Switch to big mode
+bigMode = false;
 
 window.addEventListener("keydown", function(ev) {
 
-  console.log(ev.keyCode);
-
-  // Reset the VR position (Currently not working)
   if (ev.keyCode == "R".charCodeAt(0))  {
-    //vr.reset();
+    video.pause();
+    video.currentTime = 0;
+    video.load();
   }
 
   // Toggle flag that allows you to fake going fullscreen in VR. Makes it easier to debug
@@ -44,7 +41,7 @@ window.addEventListener("keydown", function(ev) {
   }
 
   // Toggle Fullscreen/VR mode
-  if (ev.keyCode == "F".charCodeAt(0))  {
+  if ( ev.keyCode == "F".charCodeAt(0) ) {
     vr.fullscreen();
   }
 
@@ -54,7 +51,8 @@ window.addEventListener("keydown", function(ev) {
   }
 
   // Play/pause the movie
-  if (ev.keyCode == "P".charCodeAt(0))  {
+  if ( ev.keyCode == "P".charCodeAt(0) ||
+       ev.keyCode == " ".charCodeAt(0) )  {
     paused = !paused;
 
     if (paused) {
@@ -67,19 +65,6 @@ window.addEventListener("keydown", function(ev) {
   // Toggle full wrap around (big mode)
   if (ev.keyCode == "B".charCodeAt(0))  {
     bigMode = !bigMode;
-
-    if (bigMode) {
-      vr.camera.position.z = bigModeDistance;
-      vr.cameraLeft.position.z = bigModeDistance;
-      vr.cameraRight.position.z = bigModeDistance;
-    } 
-    // Regular viewing distance
-    else {
-      vr.camera.position.z = 620;
-      vr.cameraLeft.position.z = 620;
-      vr.cameraRight.position.z = 620;
-    }
-    console.log('big mode toggle. Bigmode = ' + bigMode);
   }
 
   if (ev.keyCode == 187 || ev.keyCode == 61)  { // "+" key

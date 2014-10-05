@@ -67,13 +67,17 @@ vrStats = {
 
   // Display a VR state
   vrState: function(vrState){
+    if ( vrState===undefined ) {
+      return;
+    }
+
     timestamp.innerHTML = vrState.timeStamp.toFixed(2);
-    orientation.innerHTML = printVector(vrState.orientation);
-    position.innerHTML = printVector(vrState.position);
-    angularVelocity.innerHTML = printVector(vrState.angularVelocity);
-    linearVelocity.innerHTML = printVector(vrState.linearVelocity);
-    angularAcceleration.innerHTML = printVector(vrState.angularAcceleration);
-    linearAcceleration.innerHTML = printVector(vrState.linearAcceleration);
+    orientation.innerHTML = vr.printVector(vrState.orientation);
+    position.innerHTML = vr.printVector(vrState.position);
+    angularVelocity.innerHTML = vr.printVector(vrState.angularVelocity);
+    linearVelocity.innerHTML = vr.printVector(vrState.linearVelocity);
+    angularAcceleration.innerHTML = vr.printVector(vrState.angularAcceleration);
+    linearAcceleration.innerHTML = vr.printVector(vrState.linearAcceleration);
   }
 };
 

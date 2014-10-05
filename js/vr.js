@@ -13,7 +13,7 @@ vr.position = {
 
 var VR_POSITION_SCALE = 25;
 
-function printVector(values) {
+vr.printVector = function(values) {
   var str = "[";
 
   str += values.x.toFixed(2) + ", ";
@@ -167,12 +167,10 @@ function EnumerateVRDevices(devices) {
     if (devices[i] instanceof HMDVRDevice) {
       hmdDevice = devices[i];
 
-      console.log(hmdDevice);
-
       var eyeOffsetLeft = hmdDevice.getEyeTranslation("left");
-      var eyeOffsetRight = hmdDevice.getEyeTranslation("right")
-      document.getElementById("leftTranslation").innerHTML = printVector(eyeOffsetLeft);
-      document.getElementById("rightTranslation").innerHTML = printVector(eyeOffsetRight);
+      var eyeOffsetRight = hmdDevice.getEyeTranslation("right");
+      document.getElementById("leftTranslation").innerHTML = vr.printVector(eyeOffsetLeft);
+      document.getElementById("rightTranslation").innerHTML = vr.printVector(eyeOffsetRight);
 
       cameraLeft.position.add(eyeOffsetLeft);
       cameraLeft.position.z = 1000;
@@ -201,8 +199,8 @@ if (navigator.getVRDevices) {
 } else if (navigator.mozGetVRDevices) {
   navigator.mozGetVRDevices(EnumerateVRDevices);
 } else {
-  stats.classList.add("error");
-  stats.innerHTML = "WebVR API not supported";
+  //stats.classList.add("error");
+  //stats.innerHTML = "WebVR API not supported";
 }
 
 /*
@@ -253,15 +251,29 @@ document.addEventListener("webkitfullscreenchange", onFullscreenChange, false);
 document.addEventListener("mozfullscreenchange", onFullscreenChange, false);
 
 vr.fullscreen = function(){
-  vrMode = true;
-  console.log('vr.fullscreen, vrMode = true');
+  vrMode = !vrMode;
+  
   resize();
-  if ( renderer.domElement.webkitRequestFullscreen && fakeFullscreen===false ) {
-    renderer.domElement.webkitRequestFullscreen({ vrDisplay: hmdDevice });
+
+  // Go fullscreen
+  if ( vrMode === true ) {
+    if ( renderer.domElement.webkitRequestFullscreen && fakeFullscreen===false ) {
+      renderer.domElement.webkitRequestFullscreen({ vrDisplay: hmdDevice });
+    } 
+    else if ( renderer.domElement.mozRequestFullScreen && fakeFullscreen===false ) {
+      renderer.domElement.mozRequestFullScreen({ vrDisplay: hmdDevice });
+    }
   } 
-  else if ( renderer.domElement.mozRequestFullScreen && fakeFullscreen===false ) {
-    renderer.domElement.mozRequestFullScreen({ vrDisplay: hmdDevice });
+  // Cancel fullscreen
+  else {
+    if ( document.webkitExitFullscreen ) {
+      document.webkitExitFullscreen();
+    } 
+    else if ( document.mozCancelFullScreen ) {
+      document.mozCancelFullScreen();
+    }
   }
+  
 };
 
 
@@ -290,9 +302,9 @@ function updateCamera(camera){
       //console.log(state.position);
 
       // Multiply by translate scale as the position changes seem to be small
-      camera.position.x = vr.position.x+state.position.x*translatedScale;
-      camera.position.y = vr.position.y+state.position.y*translatedScale;
-      camera.position.z = vr.position.z+state.position.z*translatedScale;
+      camera.position.x = vr.position.x+state.position.x;
+      camera.position.y = vr.position.y+state.position.y;
+      camera.position.z = vr.position.z+state.position.z;
       
     }
   }
