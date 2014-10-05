@@ -1,6 +1,6 @@
 Overview
 ----------
-Watch movies at virtual theatre that runs in your browser.
+Watch moviess in a virtual movie theatre that runs in your browser. This repo holds a working prototype that will be improved about during Brightcove's mid October Hackweek.
 
 Requirements
 ----------
