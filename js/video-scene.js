@@ -6,8 +6,43 @@ var renderer = vr.renderer,
     scene = vr.scene,
     mesh;
 
-var videoWidth = 960,
-    videoHeight = 540,
+
+var videos = [
+      {
+        name: 'Toystory 3 (3D, Smaller)',
+        url: 'textures/toystory3.backup.ogv',
+        width: 320,
+        height: 360,
+        type: 'left-left-right-right'
+      },
+      {
+        name: 'Toystory 3 (3D)',
+        url: 'textures/toystory3.ogv',
+        width: 640,
+        height: 720,
+        type: 'left-left-right-right'
+      },
+      {
+        name: 'Big Buck Bunny (3D)',
+        url: 'textures/big-small.backup.ogv',
+        width: 960,
+        height: 540,
+        type: 'left-top-right-bottom'
+      },
+      {
+        name: 'The Hobbit (3D)',
+        url: 'textures/big-small.backup.ogv',
+        width: 426,
+        height: 480,
+        type: 'left-left-right-right'
+      },
+      
+
+    ]
+
+var currentVideo = videos[2],
+    videoWidth = currentVideo.width,
+    videoHeight = currentVideo.height,
     videoAspectRatio = videoWidth/videoHeight,
     screenDistance = 1.5,
     screenWidth = 1.5,
@@ -84,7 +119,14 @@ videoScene.beforeMonoRender = function() {
 
 videoScene.beforeLeftRender = function() {
   if ( video.readyState === video.HAVE_ENOUGH_DATA ) {
-    imageContext.drawImage( 
+
+    // Non 3D movies update their textures in videoScene.beforeMonoRender()
+    if( currentVideo.type === 'regular' ) {
+      return;
+    }
+
+    // Render the left eye frame of the 3D video
+    imageContext.drawImage(
       video, 
       // Source
       0, 0, videoWidth, videoHeight,
@@ -103,18 +145,38 @@ videoScene.beforeLeftRender = function() {
 
 videoScene.beforeRightRender = function() {
   // Skip copying the right frame over the left frame if 3d mode is disabled
-  if( in3dMode===false ){
+  // or if the movie is a regular one, in which case it's textures is updated in 
+  // videoScene.beforeMonoRender()
+  if( in3dMode===false || currentVideo.type==='regular' ){
     return;
   }
 
   if ( video.readyState === video.HAVE_ENOUGH_DATA ) {
-    imageContext.drawImage( 
-      video, 
-      // Source
-      0, videoHeight, videoWidth, videoHeight,
-      // Destination
-      0, 0, videoWidth, videoHeight
-       );
+
+    // The left frame is on the left half of the video frame and 
+    // the right frame is on the right half of the video frame
+    if( currentVideo.type === 'left-left-right-right' ) {
+      
+      imageContext.drawImage( 
+        video, 
+        // Source
+        videoWidth, 0, videoWidth, videoHeight,
+        // Destination
+        0, 0, videoWidth, videoHeight
+         );
+
+    } 
+    // The left frame is on the top half of the video frame and 
+    // the right frame is on the bottom half of the video frame
+    else if( currentVideo.type === 'left-top-right-bottom' ) {
+      imageContext.drawImage( 
+        video, 
+        // Source
+        0, videoHeight, videoWidth, videoHeight,
+        // Destination
+        0, 0, videoWidth, videoHeight
+         );
+    }
 
     if ( texture ) texture.needsUpdate = true;
     //if ( textureReflection ) textureReflection.needsUpdate = true;
