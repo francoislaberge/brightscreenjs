@@ -1,6 +1,7 @@
 (function(){
 
-var paused = false;
+// Make this a global so video rendering scenes can do less when paused
+paused = false;
 
 // Should we render the movie in 3D mode (Global)
 in3dMode = true;

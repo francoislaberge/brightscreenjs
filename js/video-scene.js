@@ -106,6 +106,12 @@ videoScene.update = function() {
 
 videoScene.beforeMonoRender = function() {
   if ( video.readyState === video.HAVE_ENOUGH_DATA ) {
+
+    // Skip updating copying video frames to the screen texture when the video is paused
+    if(paused){
+      return;
+    }
+
     imageContext.drawImage( video, 0, 0 );
 
     if ( texture ) texture.needsUpdate = true;
@@ -119,6 +125,11 @@ videoScene.beforeMonoRender = function() {
 
 videoScene.beforeLeftRender = function() {
   if ( video.readyState === video.HAVE_ENOUGH_DATA ) {
+
+    // Skip updating copying video frames to the screen texture when the video is paused
+    if(paused){
+      return;
+    }
 
     // Non 3D movies update their textures in videoScene.beforeMonoRender()
     if( currentVideo.type === 'regular' ) {
@@ -144,6 +155,12 @@ videoScene.beforeLeftRender = function() {
 }
 
 videoScene.beforeRightRender = function() {
+  
+  // Skip updating copying video frames to the screen texture when the video is paused
+  if(paused){
+    return;
+  }
+
   // Skip copying the right frame over the left frame if 3d mode is disabled
   // or if the movie is a regular one, in which case it's textures is updated in 
   // videoScene.beforeMonoRender()
