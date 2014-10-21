@@ -13,6 +13,10 @@ videoScene.init();
 
 // Update/Render loop
 vr.loop({
+  
+  // Provide a stats counter
+  stats: vrStats,
+
   // 
   update: function (){
     //vr.camera.lookAt( scene.position );    
@@ -24,12 +28,12 @@ vr.loop({
 
   },
 
-  // Called just before the left eye is going to render (if we're in vr mode, so beforeMono() for when we're not)
+  // Called just before the left eye is going to render (if we're in vr mode, see beforeMono() for when we're not)
   beforeLeftRender: function() {
     videoScene.beforeLeftRender();
   },
 
-  // Called just before the right eye is going to render (if we're in vr mode, so beforeMono() for when we're not)
+  // Called just before the right eye is going to render (if we're in vr mode, see beforeMono() for when we're not)
   beforeRightRender: function() {
     videoScene.beforeRightRender();
   },

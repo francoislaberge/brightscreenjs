@@ -27,6 +27,8 @@ var videos = [
         url: 'textures/big-small.backup.ogv',
         width: 960,
         height: 540,
+        topBleed: 10,
+        bottomBleed: 0,
         type: 'left-top-right-bottom'
       },
       {
@@ -35,15 +37,16 @@ var videos = [
         width: 426,
         height: 480,
         type: 'left-left-right-right'
-      },
-      
-
+      }
     ]
 
 var currentVideo = videos[2],
     videoWidth = currentVideo.width,
     videoHeight = currentVideo.height,
-    videoAspectRatio = videoWidth/videoHeight,
+    videoTopBleed = currentVideo.topBleed || 0,
+    videoBottomBleed = currentVideo.bottomBleed || 0,
+    effectiveVideoHeight = videoHeight-videoTopBleed-videoBottomBleed,
+    videoAspectRatio = videoWidth/effectiveVideoHeight,
     screenDistance = 1.5,
     screenWidth = 1.5,
     screenHeight = screenWidth/videoAspectRatio;
@@ -140,9 +143,9 @@ videoScene.beforeLeftRender = function() {
     imageContext.drawImage(
       video, 
       // Source
-      0, 0, videoWidth, videoHeight,
+      0, videoTopBleed, videoWidth, effectiveVideoHeight,
       // Destination
-      0, 0, videoWidth, videoHeight
+      0, 0, videoWidth, effectiveVideoHeight
        );
 
     if ( texture ) texture.needsUpdate = true;
@@ -177,9 +180,9 @@ videoScene.beforeRightRender = function() {
       imageContext.drawImage( 
         video, 
         // Source
-        videoWidth, 0, videoWidth, videoHeight,
+        videoWidth, videoTopBleed, videoWidth, effectiveVideoHeight,
         // Destination
-        0, 0, videoWidth, videoHeight
+        0, 0, videoWidth, effectiveVideoHeight
          );
 
     } 
@@ -189,9 +192,9 @@ videoScene.beforeRightRender = function() {
       imageContext.drawImage( 
         video, 
         // Source
-        0, videoHeight, videoWidth, videoHeight,
+        0, videoHeight+videoTopBleed, videoWidth, effectiveVideoHeight,
         // Destination
-        0, 0, videoWidth, videoHeight
+        0, 0, videoWidth, effectiveVideoHeight
          );
     }
 
@@ -212,9 +215,10 @@ function init() {
   // Create a canvas element that we will use to 
   // copy video frames to and update the virtual tv screen's texture
   image = document.createElement( 'canvas' );
-    // Make it the same resolution as the video
+    // Make it the same resolution as the video 
   image.width = videoWidth;
-  image.height = videoHeight;
+
+  image.height = effectiveVideoHeight; // (Height adjustment for the bleed)
   imageContext = image.getContext( '2d' );
 
   // Create the texture that will be updated each frame with the most recent

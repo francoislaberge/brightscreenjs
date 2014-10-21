@@ -42,7 +42,6 @@ vr.update = function () {
 var sensorDevice = null;
 var hmdDevice = null;
 var vrMode = false;
-var stats = document.getElementById("stats");
 var renderTargetWidth = 1920;
 var renderTargetHeight = 1080;
 var nearPlane = 0.1;
@@ -144,7 +143,6 @@ vr.resizeFOV = function resizeFOV(amount) {
     var rightEyeViewport = hmdDevice.getRecommendedEyeRenderRect("right");
     renderTargetWidth = leftEyeViewport.width + rightEyeViewport.width;
     renderTargetHeight = Math.max(leftEyeViewport.height, rightEyeViewport.height);
-    document.getElementById("renderTarget").innerHTML = renderTargetWidth + "x" + renderTargetHeight;
   }
 
   resize();
@@ -169,8 +167,6 @@ function EnumerateVRDevices(devices) {
 
       var eyeOffsetLeft = hmdDevice.getEyeTranslation("left");
       var eyeOffsetRight = hmdDevice.getEyeTranslation("right");
-      document.getElementById("leftTranslation").innerHTML = vr.printVector(eyeOffsetLeft);
-      document.getElementById("rightTranslation").innerHTML = vr.printVector(eyeOffsetRight);
 
       cameraLeft.position.add(eyeOffsetLeft);
       cameraLeft.position.z = 1000;
@@ -187,9 +183,6 @@ function EnumerateVRDevices(devices) {
     if (devices[i] instanceof PositionSensorVRDevice &&
          (!hmdDevice || devices[i].hardwareUnitId == hmdDevice.hardwareUnitId)) {
       sensorDevice = devices[i];
-      document.getElementById("hardwareUnitId").innerHTML = sensorDevice.hardwareUnitId;
-      document.getElementById("deviceId").innerHTML = sensorDevice.deviceId;
-      document.getElementById("deviceName").innerHTML = sensorDevice.deviceName;
     }
   }
 }
@@ -334,7 +327,11 @@ function updateCamera(camera){
 vr.loop = function(options) {
   options = options || {};
 
-  vrStats.begin();
+  // If a stats object was provided then call it's begin() marker function
+  if( options.stats!==undefined&&
+      typeof options.stats.begin==='function' ) {
+    options.stats.begin();
+  }
 
   // TODO: Verify that using requestAnimationFrame leads to smoother visuals,
   // using setTimeout to a low delay seems to create a higher framerate, but is it wasted
@@ -388,7 +385,12 @@ vr.loop = function(options) {
     renderer.render(scene, camera);
   }
 
-  vrStats.end();
+  // If a stats object was provided then call it's end() marker function
+  if( options.stats!==undefined&&
+      typeof options.stats.end==='function' ) {
+    options.stats.end();
+  }
+  
 };
 
 document.body.appendChild( renderer.domElement );
